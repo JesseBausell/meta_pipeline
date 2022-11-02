@@ -23,5 +23,11 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs=["primary_raw_dataset","params:program"],
                 outputs="program_dataset",
                 name="program_compiler"
-            )
+            ),
+            node(
+                func=json_extender,
+                inputs=["program_dataset", "params:country"],
+                outputs="country_dataset",
+                name="program_country_compiler"
+            ),
         ])

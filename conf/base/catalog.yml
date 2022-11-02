@@ -20,7 +20,7 @@ primary_raw_dataset:
   save_args:
     index: True
   load_args:
-    index_col: 0
+    index_col: [0,23,24]
 
 primary_coordinate_dataset:
   type: pandas.CSVDataSet
@@ -35,3 +35,13 @@ program_dataset:
   filepath: data/02_intermediate/platform_programs.csv
   save_args:
     index: True
+  load_args:
+    index_col: [0,1,2]
+
+country_dataset:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/platform_countries.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]

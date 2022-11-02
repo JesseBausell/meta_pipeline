@@ -1,2 +1,9 @@
 
 program: program
+country: program_country
+program_merge:
+  exclude_program:
+    - program_country
+  index:
+    - lat
+    - lon
