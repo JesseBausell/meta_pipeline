@@ -9,6 +9,11 @@ oops_platforms_region:
   params:
     key: bUKGHfwzGboEOWVCg4COe93gu0
     format: JSON
+    exp: ptfDepl.lat>6.8 and ptfDepl.lat<25.03 and ptfDepl.lon>98.8 and ptfDepl.lon<121.57
+    include: [ptfDepl.ship.name, program.country.id, program.country.name, ptfModel.ptfType, ptfModel.id, ptfDepl.lat, ptfDepl.lon,
+              ptfModel.ptfType.ptfFamily, ptfVariables.variableId, ptfVariables.firstMeasured, ptfVariables.lastMeasured,
+              program.name, program.nameShort, program.id]
+
 
 primary_raw_dataset:
   type: pandas.CSVDataSet
