@@ -14,9 +14,24 @@ oops_platforms_region:
               ptfModel.ptfType.ptfFamily, ptfVariables.variableId, ptfVariables.firstMeasured, ptfVariables.lastMeasured,
               program.name, program.nameShort, program.id]
 
-
 primary_raw_dataset:
   type: pandas.CSVDataSet
   filepath: data/01_raw/raw_platforms.csv
   save_args:
-    index: False
+    index: True
+  load_args:
+    index_col: 0
+
+primary_coordinate_dataset:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/raw_coordinates.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: 0
+
+program_dataset:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/platform_programs.csv
+  save_args:
+    index: True
