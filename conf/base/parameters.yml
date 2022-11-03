@@ -1,2 +1,7 @@
 
 program: program
+country: program_country
+platform_model: ptfModel
+ptfModel_ptfType: ptfModel_ptfType
+ptfModel_ptfType_ptfFamily: ptfModel_ptfType_ptfFamily
+ptfVariables: ptfVariables
