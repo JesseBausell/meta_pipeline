@@ -15,9 +15,9 @@ def series_2_dataframe(series: pd.core.series.Series) -> pd.DataFrame:
         pass
     series_df = pd.DataFrame(list(series),index=series.index)
     header = series.name
-    print(header)
-    new_headers = {key: header + '_' + key for key in series_df.keys()}
-    series_df.rename(columns=new_headers, inplace=True)
+    if header != "ptfVariables":
+        new_headers = {key: header + '_' + key for key in series_df.keys()}
+        series_df.rename(columns=new_headers, inplace=True)
     return series_df
 
 def json_pandas(oops_platforms_region: requests.models.Response) -> pd.DataFrame:
@@ -40,10 +40,16 @@ def json_extender(primary_raw_dataset: pd.DataFrame, header: str) -> pd.DataFram
     # dataframe_new.drop(columns=header,inplace=True)
     return dataframe_new
 
-def df_merge(df1: pd.DataFrame,df2: pd.DataFrame,df1_discard: Dict) -> pd.DataFrame:
-    df1_discard = df1_discard["exclude_program"]
+def df_merge(df1: pd.DataFrame,df2: pd.DataFrame,df1_discard: str) -> pd.DataFrame:
+    # df1_discard = df1_discard["exclude_program"]
     df1.drop(columns=df1_discard, inplace=True)
     # df2.drop(columns=df2_discard, inplace=True)
     merged_df = df1.join(df2)
     return merged_df
 
+def varaiable_extender(primary_raw_dataset: pd.DataFrame, header: str) -> pd.DataFrame:
+    series = primary_raw_dataset[header]
+    dataframe_new = series_2_dataframe(series)
+    stacked_dataframe = pd.DataFrame((dataframe_new.stack()), columns=[header])
+    variable_df = pd.DataFrame(list(stacked_dataframe[header]), index=stacked_dataframe.index)
+    return variable_df

@@ -48,7 +48,55 @@ country_dataset:
 
 merged_program_country:
   type: pandas.CSVDataSet
-  filepath: data/02_intermediate/platform_program_nations.csv
+  filepath: data/03_primary/program_all_data.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]
+
+platform_model_dataset:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/platform_model.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]
+
+platform_ptfModel_ptfType:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/platform_model_ptfType.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]
+
+platform_ptfModel_ptfType_ptfFamily:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/platform_ptfModel_ptfType_ptfFamily.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]
+
+platform_ptfModel_ptfType_merger:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/platform_ptfModel_ptfType_merger.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]
+
+platform_ptfModel_ptfType_ptfFamily_merger:
+  type: pandas.CSVDataSet
+  filepath: data/03_primary/platform_all_data.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]
+
+variable_dataset:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/variable_dataset.csv
   save_args:
     index: True
   load_args:
