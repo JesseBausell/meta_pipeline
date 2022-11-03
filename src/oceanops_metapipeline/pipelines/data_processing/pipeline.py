@@ -5,10 +5,11 @@ generated using Kedro 0.18.3
 
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import json_pandas, json_extender
+from .nodes import json_pandas, json_extender, df_merge
 
 
 def create_pipeline(**kwargs) -> Pipeline:
+
     return pipeline(
         [
             node(
@@ -29,5 +30,11 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs=["program_dataset", "params:country"],
                 outputs="country_dataset",
                 name="program_country_compiler"
+            ),
+            node(
+                func=df_merge,
+                inputs=["program_dataset", "country_dataset","params:program_merge"],
+                outputs="merged_program_country",
+                name="program_country_merger"
             ),
         ])

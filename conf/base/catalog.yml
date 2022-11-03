@@ -45,3 +45,11 @@ country_dataset:
     index: True
   load_args:
     index_col: [0,1,2]
+
+merged_program_country:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/platform_program_nations.csv
+  save_args:
+    index: True
+  load_args:
+    index_col: [0,1,2]

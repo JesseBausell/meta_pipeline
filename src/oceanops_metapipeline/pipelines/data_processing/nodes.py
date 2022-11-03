@@ -40,4 +40,10 @@ def json_extender(primary_raw_dataset: pd.DataFrame, header: str) -> pd.DataFram
     # dataframe_new.drop(columns=header,inplace=True)
     return dataframe_new
 
-def df_merge()
+def df_merge(df1: pd.DataFrame,df2: pd.DataFrame,df1_discard: Dict) -> pd.DataFrame:
+    df1_discard = df1_discard["exclude_program"]
+    df1.drop(columns=df1_discard, inplace=True)
+    # df2.drop(columns=df2_discard, inplace=True)
+    merged_df = df1.join(df2)
+    return merged_df
+
