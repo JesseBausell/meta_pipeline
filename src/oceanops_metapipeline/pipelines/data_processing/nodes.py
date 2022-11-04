@@ -52,4 +52,25 @@ def varaiable_extender(primary_raw_dataset: pd.DataFrame, header: str) -> pd.Dat
     dataframe_new = series_2_dataframe(series)
     stacked_dataframe = pd.DataFrame((dataframe_new.stack()), columns=[header])
     variable_df = pd.DataFrame(list(stacked_dataframe[header]), index=stacked_dataframe.index)
+    variable_df.fillna(method='ffill', inplace=True)
     return variable_df
+
+def dataframe_refinement(intermediate_dataset: pd.DataFrame,reference_dataset: pd.DataFrame,header: Dict) -> pd.DataFrame:
+    intermediate_dataset = intermediate_dataset[header["df_headers"]]
+    intermediate_dataset.drop_duplicates(inplace=True)
+    reference_dataset = reference_dataset[header["rt_headers"]]
+    refined_dataset = intermediate_dataset.merge(reference_dataset, how='inner', left_on=header["df_merge"], right_on=header["rt_merge"])
+    refined_dataset.drop(columns=header["rt_merge"])
+
+    value_counts = pd.DataFrame(intermediate_dataset['variableId'].value_counts()).rename(columns={header["df_merge"]: 'counts'})
+    value_counts.index.rename(header["rt_merge"], inplace=True)
+    meta_variable_total = value_counts.merge(reference_dataset, how='inner', left_index=True,right_on=header["rt_merge"])
+    value_counts.reset_index(inplace=True)
+    IND = [i for i, v in enumerate(value_counts[header["rt_merge"]].values) if v not in reference_dataset[header["rt_merge"]].values]
+    unknown_values = value_counts.iloc[IND]
+    meta_variable_total = pd.concat([meta_variable_total, unknown_values])
+    meta_variable_total.rename(columns={header["rt_merge"]:header["df_merge"]},inplace=True)
+    return refined_dataset, meta_variable_total
+
+
+

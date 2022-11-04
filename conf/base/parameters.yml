@@ -5,3 +5,21 @@ platform_model: ptfModel
 ptfModel_ptfType: ptfModel_ptfType
 ptfModel_ptfType_ptfFamily: ptfModel_ptfType_ptfFamily
 ptfVariables: ptfVariables
+
+df_refinement:
+  df_headers:
+    - ptf_id
+    - lat
+    - lon
+    - firstMeasured
+    - lastMeasured
+    - variableId
+  df_merge: variableId
+  rt_headers:
+    - id
+    - name
+    - nameShort
+    - canonicalUnit
+    - description
+  rt_merge: id
+

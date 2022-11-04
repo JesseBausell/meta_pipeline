@@ -99,5 +99,23 @@ variable_dataset:
   filepath: data/02_intermediate/variable_dataset.csv
   save_args:
     index: True
+#  load_args:
+#    index_col: [0,1,2]
+
+variable_reference_table:
+  type: pandas.CSVDataSet
+  filepath: data/reference_tables/Variable.csv
+
+variable_refined_data:
+  type: pandas.CSVDataSet
+  filepath: data/03_primary/variable_all_data.csv
+  save_args:
+    index: False
   load_args:
     index_col: [0,1,2]
+
+tabulated_variable_data:
+  type: pandas.CSVDataSet
+  filepath: data/03_primary/tabulated_variable_data.csv
+  save_args:
+    index: False
