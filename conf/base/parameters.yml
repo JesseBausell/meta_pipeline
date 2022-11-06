@@ -22,4 +22,5 @@ df_refinement:
     - canonicalUnit
     - description
   rt_merge: id
+  header_name: Variable
 

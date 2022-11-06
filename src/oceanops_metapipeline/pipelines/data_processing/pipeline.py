@@ -5,7 +5,7 @@ generated using Kedro 0.18.3
 
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import json_pandas, json_extender, df_merge, varaiable_extender, dataframe_refinement
+from .nodes import json_pandas, json_extender, df_merge, varaiable_extender, dataframe_refinement, boolean_variable_extension
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -84,6 +84,12 @@ def create_pipeline(**kwargs) -> Pipeline:
             inputs=["variable_dataset","variable_reference_table","params:df_refinement"],
             outputs=["variable_refined_data","tabulated_variable_data"],
             name="variable_dataset_refiner"
+        ),
+        node(
+            func=boolean_variable_extension,
+            inputs="variable_refined_data",
+            outputs="boolean_yearly_variable",
+            name="boolean_years_for_variables"
         )
     ])
     return program_pipeline + platform_pipeline + variable_pipeline
