@@ -33,17 +33,12 @@ def json_pandas(oops_platforms_region: requests.models.Response) -> pd.DataFrame
     return platforms_df
 
 def json_extender(primary_raw_dataset: pd.DataFrame, header: str) -> pd.DataFrame:
-    # subset_raw_dataset = primary_raw_dataset[['lat','lon',header]]
     series = primary_raw_dataset[header]
     dataframe_new = series_2_dataframe(series)
-    # intermediate_dataset = primary_raw_dataset.join(dataframe_new)
-    # dataframe_new.drop(columns=header,inplace=True)
     return dataframe_new
 
 def df_merge(df1: pd.DataFrame,df2: pd.DataFrame,df1_discard: str) -> pd.DataFrame:
-    # df1_discard = df1_discard["exclude_program"]
     df1.drop(columns=df1_discard, inplace=True)
-    # df2.drop(columns=df2_discard, inplace=True)
     merged_df = df1.join(df2)
     return merged_df
 
@@ -60,7 +55,8 @@ def dataframe_refinement(intermediate_dataset: pd.DataFrame,reference_dataset: p
     intermediate_dataset.drop_duplicates(inplace=True)
     reference_dataset = reference_dataset[header["rt_headers"]]
     refined_dataset = intermediate_dataset.merge(reference_dataset, how='inner', left_on=header["df_merge"], right_on=header["rt_merge"])
-    refined_dataset.drop(columns=header["rt_merge"])
+    refined_dataset.drop(columns=header["df_merge"],inplace=True)
+    # refined_dataset.insert(2, "delta_time", time_delta)
 
     value_counts = pd.DataFrame(intermediate_dataset['variableId'].value_counts()).rename(columns={header["df_merge"]: 'counts'})
     value_counts.index.rename(header["rt_merge"], inplace=True)
@@ -69,8 +65,28 @@ def dataframe_refinement(intermediate_dataset: pd.DataFrame,reference_dataset: p
     IND = [i for i, v in enumerate(value_counts[header["rt_merge"]].values) if v not in reference_dataset[header["rt_merge"]].values]
     unknown_values = value_counts.iloc[IND]
     meta_variable_total = pd.concat([meta_variable_total, unknown_values])
-    meta_variable_total.rename(columns={header["rt_merge"]:header["df_merge"]},inplace=True)
+
+    refined_dataset.set_index(['ptf_id', 'lat', 'lon'], inplace=True)
+    new_headers_refined = {key: header['header_name'] + '_' + key for key in refined_dataset.keys()}
+    refined_dataset.rename(columns=new_headers_refined,inplace=True)
+    time_delta = pd.to_datetime(refined_dataset['Variable_lastMeasured'])-pd.to_datetime(refined_dataset['Variable_firstMeasured'])
+    refined_dataset.insert(2, "time_delta", time_delta)
+    new_headers_meta = {key: header['header_name'] + '_' + key for key in meta_variable_total.keys()}
+    meta_variable_total.rename(columns=new_headers_meta,inplace=True)
     return refined_dataset, meta_variable_total
 
+def year_dictionary(years):
+    years = years.split(',')
+    return {year: 1 for year in range(int(years[0]),int(years[1])+1)}
 
-
+def boolean_variable_extension(primary_raw_dataset):
+    primary_raw_dataset['start_year'] = pd.to_datetime(primary_raw_dataset['Variable_firstMeasured']).dt.year.astype(str)
+    primary_raw_dataset['stop_year'] = pd.to_datetime(primary_raw_dataset['Variable_lastMeasured']).dt.year.astype(str)
+    primary_raw_dataset['year_list'] = primary_raw_dataset['start_year'] + ',' + primary_raw_dataset['stop_year']
+    year_series = primary_raw_dataset['year_list'].apply(year_dictionary)
+    year_boolean_df = pd.DataFrame(list(year_series), index=year_series.index)
+    year_boolean_df = ~year_boolean_df.isna()
+    year_columns = list(year_boolean_df.keys())
+    year_columns.sort()
+    boolean_variable_df = year_boolean_df[year_columns]
+    return boolean_variable_df
