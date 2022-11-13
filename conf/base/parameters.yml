@@ -24,3 +24,36 @@ df_refinement:
   rt_merge: id
   header_name: Variable
 
+#var_tabulation:
+#  df_headers:
+#    - variableId
+#  rt_headers:
+#    - id
+#    - name
+#    - nameShort
+#    - canonicalUnit
+#    - description
+#  df_merge: variableId
+#  rt_merge: id
+
+program_country_group:
+  group_by: program_country_name
+  list_by: program_name
+
+platform_group:
+  group_by: ptfModel_ptfType_id
+  list_by:
+    - ptfModel_ptfType_description
+    - ptfModel_ptfType_nameShort
+    - ptfModel_ptfType_ptfFamily_name
+
+variable_group:
+  group_by:  Variable_id
+  rt_headers:
+    - ptfModel_ptfType_description
+    - ptfModel_ptfType_nameShort
+  list_by:
+    - Variable_name
+    - ptfModel_ptfType_nameShort
+    - Variable_canonicalUnit
+    - ptfModel_ptfType_description

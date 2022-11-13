@@ -54,26 +54,18 @@ def dataframe_refinement(intermediate_dataset: pd.DataFrame,reference_dataset: p
     intermediate_dataset = intermediate_dataset[header["df_headers"]]
     intermediate_dataset.drop_duplicates(inplace=True)
     reference_dataset = reference_dataset[header["rt_headers"]]
-    refined_dataset = intermediate_dataset.merge(reference_dataset, how='inner', left_on=header["df_merge"], right_on=header["rt_merge"])
-    refined_dataset.drop(columns=header["df_merge"],inplace=True)
-    # refined_dataset.insert(2, "delta_time", time_delta)
-
-    value_counts = pd.DataFrame(intermediate_dataset['variableId'].value_counts()).rename(columns={header["df_merge"]: 'counts'})
-    value_counts.index.rename(header["rt_merge"], inplace=True)
-    meta_variable_total = value_counts.merge(reference_dataset, how='inner', left_index=True,right_on=header["rt_merge"])
-    value_counts.reset_index(inplace=True)
-    IND = [i for i, v in enumerate(value_counts[header["rt_merge"]].values) if v not in reference_dataset[header["rt_merge"]].values]
-    unknown_values = value_counts.iloc[IND]
-    meta_variable_total = pd.concat([meta_variable_total, unknown_values])
-
+    refined_dataset = intermediate_dataset.merge(reference_dataset, how='outer', left_on=header["df_merge"],
+                                                 right_on=header["rt_merge"])
+    refined_dataset = refined_dataset.loc[~refined_dataset[header["df_merge"]].isna()]
+    refined_dataset.drop(columns=header["rt_merge"], inplace=True)
+    refined_dataset.rename(columns={header["df_merge"]:header["rt_merge"]},inplace=True)
     refined_dataset.set_index(['ptf_id', 'lat', 'lon'], inplace=True)
     new_headers_refined = {key: header['header_name'] + '_' + key for key in refined_dataset.keys()}
-    refined_dataset.rename(columns=new_headers_refined,inplace=True)
-    time_delta = pd.to_datetime(refined_dataset['Variable_lastMeasured'])-pd.to_datetime(refined_dataset['Variable_firstMeasured'])
+    refined_dataset.rename(columns=new_headers_refined, inplace=True)
+    time_delta = pd.to_datetime(refined_dataset['Variable_lastMeasured']) - pd.to_datetime(
+        refined_dataset['Variable_firstMeasured'])
     refined_dataset.insert(2, "time_delta", time_delta)
-    new_headers_meta = {key: header['header_name'] + '_' + key for key in meta_variable_total.keys()}
-    meta_variable_total.rename(columns=new_headers_meta,inplace=True)
-    return refined_dataset, meta_variable_total
+    return refined_dataset
 
 def year_dictionary(years):
     years = years.split(',')
