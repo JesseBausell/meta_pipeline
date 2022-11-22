@@ -21,9 +21,15 @@ def create_pipeline(**kwargs) -> Pipeline:
 
         node(
             func=dataframe_tabulated,
-            inputs=["merged_program_country","params:program_country_group"],
+            inputs=["merged_program_country","params:nation_group"],
+            outputs="tabulated_nation_data",
+            name="nation_tabulator"
+        ),
+        node(
+            func=dataframe_tabulated,
+            inputs=["merged_program_country", "params:program_group"],
             outputs="tabulated_program_data",
-            name="program_country_tabulator"
+            name="program_program_tabulator"
         ),
         node(
             func=dataframe_tabulated,
@@ -55,7 +61,21 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "params:boolean_counts_country"],
             outputs="tabulated_countries_data_annual_counts",
             name="annual_country_counter"
-        )
+        ),
+        node(
+            func=dataframe_counts_excel_filtered,
+            inputs=["boolean_yearly_variable", "merged_program_country",
+                    "params:boolean_counts_program"],
+            outputs="tabulated_programs_data_annual_counts",
+            name="annual_program_counter"
+        ),
+        # node(
+        #     func=dataframe_counts_excel_filtered,
+        #     inputs=["boolean_yearly_variable", "platform_ptfModel_ptfType_ptfFamily_merger",
+        #             "params:boolean_counts_platform"],
+        #     outputs="tabulated_platform_data_annual_counts",
+        #     name="annual_platform_counter"
+        # )
     ])
 
     return data_tabulate_days + data_merge + yearly_tabulate

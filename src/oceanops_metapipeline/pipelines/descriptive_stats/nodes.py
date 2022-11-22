@@ -7,11 +7,13 @@ from typing import Dict
 import numpy as np
 
 def dataframe_tabulated(primary_dataset: pd.DataFrame, header: Dict) -> pd.DataFrame:
+    nan_ind = pd.isna(primary_dataset.loc[:, (header['group_by'])])
+    primary_dataset.loc[nan_ind, (header['group_by'])] = "Not_listed"
     primary_lists = primary_dataset.groupby(header['group_by'], sort=True)[header["list_by"]].agg(
         lambda x: list(set(x))).reset_index()
     primary_counts = primary_dataset.groupby(header['group_by'])[header['group_by']].count().to_frame().rename(
         columns={header['group_by']: "counts"})
-    merged_counts = primary_counts.merge(primary_lists, left_index=True, right_on=header['group_by'])
+    merged_counts = primary_counts.merge(primary_lists, left_index=True, right_on=header['group_by'],how='outer')
     return merged_counts
 
 def dataframe_merge_tabulate(primary_dataset: pd.DataFrame, reference_dataset: pd.DataFrame, header: Dict):
@@ -50,11 +52,29 @@ def dataframe_counts_excel_filtered(boolean_dataset_counts: pd.DataFrame, totals
     boolean_dataset_counts.reset_index(inplace=True)
     boolean_dataset_counts.drop(columns=header_counts['drop'], inplace=True)
     boolean_dataset_counts_singles = boolean_dataset_counts.groupby(header_counts['index_reset']).max()
-    boolean_dataset_counts_singles = totals_dataset[[header_counts["group_by"]] + [header_counts["reference_index"]]].merge(
+
+    nan_ind = pd.isna(totals_dataset.loc[:, (header_counts['group_by'])])
+    totals_dataset.loc[nan_ind, (header_counts['group_by'])] = "N/A"
+    totals_dataset.loc[nan_ind, (header_counts['reference_index'])] = "Not_listed"
+
+    boolean_dataset_counts_singles = totals_dataset[
+        [header_counts["group_by"]] + [header_counts["reference_index"]] + [header_counts["list_by"]]].merge(
         boolean_dataset_counts_singles, how='inner', left_index=True, right_index=True)
-    counts = boolean_dataset_counts_singles.groupby([header_counts["group_by"]] + [header_counts["reference_index"]]).sum()
-    excel_data_totals = {'counts': counts}
-    excel_data_totals['Totals'] = boolean_dataset_counts_singles.groupby([header_counts["group_by"]] + [header_counts["reference_index"]])[header_counts["reference_index"]].count().to_frame()
+    counts = boolean_dataset_counts_singles.groupby(
+        [header_counts["group_by"]] + [header_counts["reference_index"]]).sum()
+    excel_data_totals = {'filtered_counts': counts}
+
+    filtered_totals = boolean_dataset_counts_singles.groupby([header_counts["group_by"]] + [header_counts["reference_index"]])[
+        header_counts["reference_index"]].count().to_frame()
+
+    filtered_totals.rename(columns={header_counts["reference_index"]: "counts"}, inplace=True)
+    filtered_totals.reset_index(inplace=True)
+
+    primary_lists = boolean_dataset_counts_singles.groupby(header_counts['group_by'], sort=True)[header_counts["list_by"]].agg(
+        lambda x: list(set(x))).reset_index()
+
+    excel_data_totals["filtered_totals"] = filtered_totals.merge(primary_lists, left_on=header_counts['group_by'],
+                                                                 right_on=header_counts['group_by'], how='outer')
     return excel_data_totals
 
 
