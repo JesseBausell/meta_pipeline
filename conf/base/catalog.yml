@@ -114,26 +114,77 @@ variable_refined_data:
   load_args:
     index_col: [0,1,2] #[0,1,2,5,6,7,8]
 
-tabulated_variable_data:
-  type: pandas.CSVDataSet
-  filepath: data/04_feature/tabulated_variable_data.csv
-  save_args:
-    index: False
+#tabulated_variable_data:
+#  type: pandas.CSVDataSet
+#  filepath: data/04_feature/tabulated_variable_data.csv
+#  save_args:
+#    index: False
 
 boolean_yearly_variable:
   type: pandas.CSVDataSet
   filepath: data/03_primary/boolean_yearly_variable.csv
   save_args:
     index: True
+  load_args:
+    index_col: [0,1,2,3,4]
+
+#boolean_yearly_variable:
+#  type: pandas.ExcelDataSet
+#  filepath: data/03_primary/boolean_yearly_variable.xlsx
+#  save_args:
+#    index: True
+#    sheet_name: boolean_counts
+#  load_args:
+#    index_col: [0,1,2,3,4]
+#    sheet_name: boolean_counts
+
+#tabulated_program_data:
+#  type: pandas.CSVDataSet
+#  filepath: data/04_feature/tabulated_program_nation_data.csv
+#  save_args:
+#    index: False
 
 tabulated_program_data:
-  type: pandas.CSVDataSet
-  filepath: data/04_feature/tabulated_program_nation_data.csv
+  type: pandas.ExcelDataSet
+  filepath: data/04_feature/tabulated_program_nation_data.xlsx
   save_args:
     index: False
+    sheet_name: Totals
+  load_args:
+    sheet_name: Totals
 
 tabulated_platform_data:
   type: pandas.CSVDataSet
   filepath: data/04_feature/tabulated_platform_data.csv
   save_args:
     index: False
+
+tabulated_variable_data:
+  type: pandas.ExcelDataSet
+  filepath: data/04_feature/tabulated_variable_data.xlsx
+  save_args:
+    index: False
+    sheet_name: Totals
+  load_args:
+    sheet_name: Totals
+
+tabulated_variable_data_annual_counts:
+  type: pandas.ExcelDataSet
+  filepath: data/04_feature/tabulated_variable_data.xlsx
+  save_args:
+    index: True
+
+boolean_daily_variable:
+  type: pandas.CSVDataSet
+  filepath: data/03_primary/boolean_daily_variable.csv
+  save_args:
+    index: True
+#    sheet_name: boolean_days
+  load_args:
+    index_col: [0,1,2,3,4]
+
+tabulated_countries_data_annual_counts:
+  type: pandas.ExcelDataSet
+  filepath: data/04_feature/tabulated_filtered_nation_data.xlsx
+  save_args:
+    index: True

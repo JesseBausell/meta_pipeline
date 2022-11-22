@@ -87,7 +87,7 @@ def create_pipeline(**kwargs) -> Pipeline:
         ),
         node(
             func=boolean_variable_extension,
-            inputs="variable_refined_data",
+            inputs=["variable_refined_data", "params:boolean_time"],
             outputs="boolean_yearly_variable",
             name="boolean_years_for_variables"
         )

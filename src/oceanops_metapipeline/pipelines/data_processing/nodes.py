@@ -6,6 +6,7 @@ generated using Kedro 0.18.3
 import pandas as pd
 import requests
 from typing import Dict
+import numpy as np
 
 def series_2_dataframe(series: pd.core.series.Series) -> pd.DataFrame:
     try:
@@ -62,18 +63,20 @@ def dataframe_refinement(intermediate_dataset: pd.DataFrame,reference_dataset: p
     refined_dataset.set_index(['ptf_id', 'lat', 'lon'], inplace=True)
     new_headers_refined = {key: header['header_name'] + '_' + key for key in refined_dataset.keys()}
     refined_dataset.rename(columns=new_headers_refined, inplace=True)
-    time_delta = pd.to_datetime(refined_dataset['Variable_lastMeasured']) - pd.to_datetime(
-        refined_dataset['Variable_firstMeasured'])
-    refined_dataset.insert(2, "time_delta", time_delta)
+    time_delta = (pd.to_datetime(refined_dataset['Variable_lastMeasured']) - pd.to_datetime(
+        refined_dataset['Variable_firstMeasured']))/np.timedelta64(1, 'D')
+    refined_dataset.insert(2, "time_delta", time_delta)#.round(2)
     return refined_dataset
 
 def year_dictionary(years):
     years = years.split(',')
     return {year: 1 for year in range(int(years[0]),int(years[1])+1)}
 
-def boolean_variable_extension(primary_raw_dataset):
-    primary_raw_dataset['start_year'] = pd.to_datetime(primary_raw_dataset['Variable_firstMeasured']).dt.year.astype(str)
-    primary_raw_dataset['stop_year'] = pd.to_datetime(primary_raw_dataset['Variable_lastMeasured']).dt.year.astype(str)
+def boolean_variable_extension(primary_raw_dataset, header: Dict):
+    primary_raw_dataset.reset_index(inplace=True)
+    primary_raw_dataset.set_index(header["reset_index"],inplace=True)
+    primary_raw_dataset['start_year'] = pd.to_datetime(primary_raw_dataset[header['start_time']]).dt.year.astype(str)
+    primary_raw_dataset['stop_year'] = pd.to_datetime(primary_raw_dataset[header['end_time']]).dt.year.astype(str)
     primary_raw_dataset['year_list'] = primary_raw_dataset['start_year'] + ',' + primary_raw_dataset['stop_year']
     year_series = primary_raw_dataset['year_list'].apply(year_dictionary)
     year_boolean_df = pd.DataFrame(list(year_series), index=year_series.index)
