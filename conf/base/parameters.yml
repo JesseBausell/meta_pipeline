@@ -81,6 +81,7 @@ boolean_counts_platform:
     - ptf_id
     - lat
     - lon
+    - Variable_nameShort
   math_operations: {sum: annual_counts}
 
 boolean_days_country:
@@ -114,4 +115,24 @@ variable_group:
     - Variable_canonicalUnit
     - ptfModel_ptfType_description
 
-
+header_variable_compiler:
+  merge_index:
+    - ptf_id
+    - lat
+    - lon
+  boolean_reset:
+    - Variable_id
+    - Variable_nameShort
+  variable_list:
+    - Variable_id
+    - Variable_nameShort
+    - Variable_firstMeasured
+    - Variable_lastMeasured
+  platform_list:
+    - ptfModel_ptfType_id
+    - ptfModel_ptfType_nameShort
+  program_list:
+    - program_id
+    - program_nameShort
+    - program_country_id
+    - program_country_name

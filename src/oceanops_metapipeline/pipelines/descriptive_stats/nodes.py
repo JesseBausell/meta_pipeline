@@ -52,27 +52,28 @@ def dataframe_counts_excel_filtered(boolean_dataset_counts: pd.DataFrame, totals
     boolean_dataset_counts.reset_index(inplace=True)
     boolean_dataset_counts.drop(columns=header_counts['drop'], inplace=True)
     boolean_dataset_counts_singles = boolean_dataset_counts.groupby(header_counts['index_reset']).max()
-
     nan_ind = pd.isna(totals_dataset.loc[:, (header_counts['group_by'])])
     totals_dataset.loc[nan_ind, (header_counts['group_by'])] = "N/A"
     totals_dataset.loc[nan_ind, (header_counts['reference_index'])] = "Not_listed"
-
-    boolean_dataset_counts_singles = totals_dataset[
-        [header_counts["group_by"]] + [header_counts["reference_index"]] + [header_counts["list_by"]]].merge(
-        boolean_dataset_counts_singles, how='inner', left_index=True, right_index=True)
+    if header_counts["list_by"] in header_counts['index_reset']:
+        boolean_dataset_counts_singles.reset_index(header_counts["list_by"], inplace=True)
+        boolean_dataset_counts_singles = totals_dataset[
+            [header_counts["group_by"]] + [header_counts["reference_index"]]].merge(
+            boolean_dataset_counts_singles, how='inner', left_index=True, right_index=True)
+    else:
+        boolean_dataset_counts_singles = totals_dataset[
+            [header_counts["group_by"]] + [header_counts["reference_index"]] + [header_counts["list_by"]]].merge(
+            boolean_dataset_counts_singles, how='inner', left_index=True, right_index=True)
     counts = boolean_dataset_counts_singles.groupby(
         [header_counts["group_by"]] + [header_counts["reference_index"]]).sum()
     excel_data_totals = {'filtered_counts': counts}
-
     filtered_totals = boolean_dataset_counts_singles.groupby([header_counts["group_by"]] + [header_counts["reference_index"]])[
         header_counts["reference_index"]].count().to_frame()
-
     filtered_totals.rename(columns={header_counts["reference_index"]: "counts"}, inplace=True)
     filtered_totals.reset_index(inplace=True)
-
-    primary_lists = boolean_dataset_counts_singles.groupby(header_counts['group_by'], sort=True)[header_counts["list_by"]].agg(
+    primary_lists = boolean_dataset_counts_singles.groupby(header_counts['group_by'], sort=True)[
+        header_counts["list_by"]].agg(
         lambda x: list(set(x))).reset_index()
-
     excel_data_totals["filtered_totals"] = filtered_totals.merge(primary_lists, left_on=header_counts['group_by'],
                                                                  right_on=header_counts['group_by'], how='outer')
     return excel_data_totals
@@ -111,4 +112,26 @@ def dataframe_time_annual(boolean_dataset: pd.DataFrame, refined_dataset: pd.Dat
     boolean_dataset = boolean_dataset.multiply(365)
     boolean_dataset.set_index(boolean_index, inplace=True)
     return boolean_dataset
+
+def yearly_variable_compiler(boolean_counts: pd.DataFrame, total_variable: pd.DataFrame, total_platform: pd.DataFrame, total_program: pd.DataFrame, header: Dict) -> Dict[str,pd.DataFrame]:
+    total_variable.reset_index(inplace=True)
+    total_variable = total_variable.groupby(header["merge_index"] + header["boolean_reset"])[
+        ["Variable_firstMeasured", "Variable_lastMeasured"]].agg(
+        lambda x: list(set(x)))
+    boolean_counts.reset_index(inplace=True)
+    boolean_counts = boolean_counts.groupby(header["merge_index"] + header["boolean_reset"]).max()
+    master_df = total_variable.merge(boolean_counts, how='inner', left_index=True, right_index=True)
+    master_df.reset_index(header["boolean_reset"], inplace=True)
+    master_df = master_df.merge(total_platform[header['platform_list']], how='inner', left_index=True, right_index=True)
+    master_df = master_df.merge(total_program[header['program_list']], how='inner', left_index=True, right_index=True)
+    header_columns = header['variable_list'] + header['platform_list'] + header['program_list']
+    master_df_columns = master_df.keys()
+    years = [c for c in master_df_columns if c.isdigit()]
+    excel_dataset = {}
+    for y in years:
+        yearly_days_array = master_df[y]
+        boolean_index = yearly_days_array != 0
+        excel_dataset[y] = master_df[header_columns + [y]].loc[boolean_index]
+        excel_dataset[y].rename(columns={y: 'days'}, inplace=True)
+    return excel_dataset
 
