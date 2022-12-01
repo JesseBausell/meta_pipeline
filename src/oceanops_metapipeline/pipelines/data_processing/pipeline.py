@@ -82,12 +82,12 @@ def create_pipeline(**kwargs) -> Pipeline:
         node(
             func=dataframe_refinement,
             inputs=["variable_dataset","variable_reference_table","params:df_refinement"],
-            outputs=["variable_refined_data","tabulated_variable_data"],
+            outputs="variable_refined_data",
             name="variable_dataset_refiner"
         ),
         node(
             func=boolean_variable_extension,
-            inputs="variable_refined_data",
+            inputs=["variable_refined_data", "params:boolean_time"],
             outputs="boolean_yearly_variable",
             name="boolean_years_for_variables"
         )

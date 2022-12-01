@@ -24,3 +24,116 @@ df_refinement:
   rt_merge: id
   header_name: Variable
 
+boolean_time:
+  start_time: Variable_firstMeasured
+  end_time: Variable_lastMeasured
+  time_delta: time_delta
+  reset_index:
+    - ptf_id
+    - lat
+    - lon
+    - Variable_id
+    - Variable_nameShort
+
+boolean_counts_variables:
+  group_by: Variable_id
+  reference_index: Variable_name
+  math_operations: {sum: annual_counts}
+
+boolean_days_variables:
+  group_by: Variable_id
+  reference_index: Variable_name
+  math_operations: {median: days_median, max: days_maximum, mean: days_mean}
+
+boolean_counts_country:
+  group_by: program_country_id
+  reference_index: program_country_name
+  list_by: program_name
+  drop:
+    - Variable_id
+    - Variable_nameShort
+  index_reset:
+    - ptf_id
+    - lat
+    - lon
+  math_operations: {sum: annual_counts}
+
+boolean_counts_program:
+  group_by: program_id
+  reference_index: program_name
+  list_by: program_country_name
+  drop:
+    - Variable_id
+    - Variable_nameShort
+  index_reset:
+    - ptf_id
+    - lat
+    - lon
+  math_operations: {sum: annual_counts}
+
+boolean_counts_platform:
+  group_by: ptfModel_id
+  reference_index: ptfModel_ptfType_nameShort
+  list_by: Variable_nameShort
+  drop:
+    - Variable_id
+  index_reset:
+    - ptf_id
+    - lat
+    - lon
+    - Variable_nameShort
+  math_operations: {sum: annual_counts}
+
+boolean_days_country:
+  group_by: program_country_id
+  reference_index: program_country_name
+  math_operations: {median: days_median, max: days_maximum, mean: days_mean}
+
+nation_group:
+  group_by: program_country_name
+  list_by: program_name
+
+program_group:
+  group_by: program_name
+  list_by: program_country_name
+
+platform_group:
+  group_by: ptfModel_ptfType_id
+  list_by:
+    - ptfModel_ptfType_description
+    - ptfModel_ptfType_nameShort
+    - ptfModel_ptfType_ptfFamily_name
+
+variable_group:
+  group_by: Variable_id
+  rt_headers:
+    - ptfModel_ptfType_description
+    - ptfModel_ptfType_nameShort
+  list_by:
+    - Variable_name
+    - ptfModel_ptfType_nameShort
+    - Variable_canonicalUnit
+    - ptfModel_ptfType_description
+
+header_variable_compiler:
+  merge_index:
+    - ptf_id
+    - lat
+    - lon
+  boolean_reset:
+    - Variable_id
+    - Variable_nameShort
+  variable_list:
+    - Variable_id
+    - Variable_nameShort
+    - Variable_firstMeasured
+    - Variable_lastMeasured
+  platform_list:
+    - ptfModel_ptfType_id
+    - ptfModel_ptfType_nameShort
+  program_list:
+    - program_id
+    - program_nameShort
+    - program_country_id
+    - program_country_name
+  raw_reference_date: insertDate
