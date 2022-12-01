@@ -136,3 +136,4 @@ header_variable_compiler:
     - program_nameShort
     - program_country_id
     - program_country_name
+  raw_reference_date: insertDate

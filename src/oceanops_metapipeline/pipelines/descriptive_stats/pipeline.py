@@ -4,7 +4,7 @@ generated using Kedro 0.18.3
 """
 
 from kedro.pipeline import Pipeline, node, pipeline
-from .nodes import dataframe_tabulated, dataframe_merge_tabulate, dataframe_counts_excel_filtered, dataframe_time_annual, dataframe_counts_excel, yearly_variable_compiler
+from .nodes import dataframe_tabulated, dataframe_merge_tabulate, dataframe_counts_excel_filtered, dataframe_time_annual, dataframe_counts_excel, yearly_variable_compiler, yearly_nonvariable_compiler
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -77,9 +77,15 @@ def create_pipeline(**kwargs) -> Pipeline:
             name="annual_platform_counter"
         ),
         node(func=yearly_variable_compiler,
-             inputs=["boolean_yearly_variable","variable_refined_data","platform_ptfModel_ptfType_ptfFamily_merger","merged_program_country","params:header_variable_compiler"],
+             inputs=["boolean_yearly_variable","variable_refined_data","platform_ptfModel_ptfType_ptfFamily_merger",
+                     "merged_program_country","params:header_variable_compiler"],
              outputs='variable_list_by_year',
-             name='variable_by_years')
+             name='variable_by_years'),
+        node(func=yearly_nonvariable_compiler,
+             inputs=["variable_refined_data","merged_program_country","platform_ptfModel_ptfType_ptfFamily_merger",
+                     "primary_raw_dataset","params:header_variable_compiler"],
+             outputs='unknown_variable_list_by_year',
+             name='annual_nonvariable_counter')
     ])
 
     return data_tabulate_days + data_merge + yearly_tabulate

@@ -135,3 +135,25 @@ def yearly_variable_compiler(boolean_counts: pd.DataFrame, total_variable: pd.Da
         excel_dataset[y].rename(columns={y: 'days'}, inplace=True)
     return excel_dataset
 
+def yearly_nonvariable_compiler(total_variables: pd.DataFrame, total_programs: pd.DataFrame,
+                                total_platforms: pd.DataFrame,primary_raw: pd.DataFrame, nonvariable_header: Dict) -> pd.DataFrame:
+    merged_df = total_variables[nonvariable_header['boolean_reset']].merge(total_platforms[nonvariable_header['platform_list']], how='outer',
+                                                              left_index=True, right_index=True)
+    boolean_ind_var = pd.isna(merged_df[nonvariable_header['boolean_reset'][0]])
+    merged_df = merged_df.loc[boolean_ind_var]
+    merged_df.drop(columns=nonvariable_header['boolean_reset'], inplace=True)
+    merged_df = merged_df.merge(total_programs[nonvariable_header['program_list']], how='inner', left_index=True, right_index=True)
+    merged_df = merged_df.merge(primary_raw[nonvariable_header['raw_reference_date']], how='inner',left_index=True, right_index=True)
+    year = pd.to_datetime(primary_raw[nonvariable_header['raw_reference_date']]).dt.year.astype(int,errors='ignore')
+    year.name = 'Year'
+    merged_df = merged_df.merge(year, how='inner',left_index=True,right_index=True)
+    bool_ind = pd.isna(merged_df['Year'])
+    unknown_year = merged_df.loc[bool_ind]
+    excel_dataframe = {"Unknown_year":unknown_year}
+    all_years = merged_df['Year'].unique()
+    all_years = all_years[~np.isnan(all_years)]
+    for yr in all_years:
+        bool_ind = merged_df['Year'] == yr
+        yearly_df = merged_df.loc[bool_ind]
+        excel_dataframe[str(yr)] = yearly_df
+    return excel_dataframe
